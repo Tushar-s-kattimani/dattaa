@@ -16,9 +16,11 @@ import {
   Loader2,
   Check,
   FileText,
-  FileDown
+  FileDown,
+  Edit2
 } from 'lucide-react';
 import { ConfirmModal } from '../components/ConfirmModal';
+import { EditShopModal } from '../components/EditShopModal';
 import {
   SUPPORTED_LANGUAGES,
   UI_STRINGS,
@@ -37,6 +39,8 @@ export const ShopRecords = () => {
   const [loading, setLoading] = useState(true);
   const [deletingShop, setDeletingShop] = useState<Shop | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [editingShop, setEditingShop] = useState<Shop | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [isDownloadingWord, setIsDownloadingWord] = useState(false);
 
@@ -187,6 +191,40 @@ export const ShopRecords = () => {
       toast.error(error.message || 'Failed to delete shop');
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleSaveShop = async (formData: {
+    shop_name: string;
+    mobile_number: string;
+    location_id: string;
+    contact_person?: string;
+    full_address?: string;
+    notes?: string;
+  }) => {
+    if (!editingShop) return;
+    setIsUpdating(true);
+    try {
+      const updated = await dataService.updateShop(editingShop.id, formData);
+      const matchedLoc = locations.find(l => l.id === formData.location_id);
+      if (matchedLoc) {
+        updated.location = matchedLoc;
+      }
+      setShops(prev => prev.map(s => (s.id === updated.id ? updated : s)));
+
+      // Pre-translate updated shop name if language is Kannada/Hindi
+      if (selectedLang !== 'en') {
+        const newTrans = translateSynchronous(updated.shop_name, selectedLang);
+        setTranslationMap(prev => ({ ...prev, [updated.shop_name.trim()]: newTrans }));
+      }
+
+      toast.success(ui.shopUpdatedSuccess);
+      setEditingShop(null);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update shop');
+      throw error;
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -664,6 +702,14 @@ export const ShopRecords = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditingShop(shop)}
+                          className="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
+                          title={ui.editShop}
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
                         <a
                           href={`tel:${shop.mobile_number}`}
                           className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
@@ -737,6 +783,16 @@ export const ShopRecords = () => {
         isLoading={isDeleting}
         onCancel={() => setDeletingShop(null)}
         onConfirm={confirmDeleteShop}
+      />
+
+      <EditShopModal
+        isOpen={Boolean(editingShop)}
+        shop={editingShop}
+        locations={locations}
+        isLoading={isUpdating}
+        selectedLang={selectedLang}
+        onClose={() => setEditingShop(null)}
+        onSave={handleSaveShop}
       />
     </div>
   );

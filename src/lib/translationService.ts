@@ -412,6 +412,13 @@ export const UI_STRINGS = {
     allLocationsTranslated: 'All Locations',
     downloadPdf: 'Download PDF',
     downloadWord: 'Download Word',
+    editShop: 'Edit Shop',
+    editShopTitle: 'Edit Shop Details',
+    editShopSubtitle: 'Update shop name, mobile number, or location',
+    saveChanges: 'Save Changes',
+    saving: 'Saving...',
+    selectLocation: 'Select a location...',
+    shopUpdatedSuccess: 'Shop updated successfully!',
   },
   kn: {
     shopRecords: 'ಅಂಗಡಿ ದಾಖಲೆಗಳು',
@@ -447,6 +454,13 @@ export const UI_STRINGS = {
     selectLanguage: 'ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ',
     activeLanguage: 'ಪ್ರಸ್ತುತ ಭಾಷೆ: ಕನ್ನಡ',
     allLocationsTranslated: 'ಎಲ್ಲಾ ಸ್ಥಳಗಳು',
+    editShop: 'ಅಂಗಡಿ ಸಂಪಾದಿಸಿ',
+    editShopTitle: 'ಅಂಗಡಿಯ ವಿವರಗಳನ್ನು ಸಂಪಾದಿಸಿ',
+    editShopSubtitle: 'ಅಂಗಡಿಯ ಹೆಸರು, ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಅಥವಾ ಸ್ಥಳವನ್ನು ನವೀಕರಿಸಿ',
+    saveChanges: 'ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಿ',
+    saving: 'ಉಳಿಸಲಾಗುತ್ತಿದೆ...',
+    selectLocation: 'ಸ್ಥಳವನ್ನು ಆಯ್ಕೆಮಾಡಿ...',
+    shopUpdatedSuccess: 'ಅಂಗಡಿಯನ್ನು ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ!',
   },
   hi: {
     shopRecords: 'दुकान रिकॉर्ड्स',
@@ -482,6 +496,13 @@ export const UI_STRINGS = {
     selectLanguage: 'भाषा चुनें',
     activeLanguage: 'सक्रिय भाषा: हिंदी',
     allLocationsTranslated: 'सभी स्थान',
+    editShop: 'दुकान संपादित करें',
+    editShopTitle: 'दुकान का विवरण संपादित करें',
+    editShopSubtitle: 'दुकान का नाम, मोबाइल नंबर या स्थान अपडेट करें',
+    saveChanges: 'बदलाव सहेजें',
+    saving: 'सहेजा जा रहा है...',
+    selectLocation: 'एक स्थान चुनें...',
+    shopUpdatedSuccess: 'दुकान सफलतापूर्वक अपडेट हो गई!',
   }
 };
 

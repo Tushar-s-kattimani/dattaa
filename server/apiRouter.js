@@ -312,7 +312,69 @@ router.post('/shops', async (req, res) => {
   }
 });
 
-// DELETE /api/shops/:id
+// PUT /api/shops/:id
+router.put('/shops/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { shop_name, contact_person, mobile_number, location_id, full_address, notes } = req.body;
+
+    if (!shop_name || !mobile_number) {
+      return res.status(400).json({ error: 'Shop name and mobile number are required' });
+    }
+
+    const trimmedMobile = mobile_number.trim();
+    const mongoose = (await import('mongoose')).default;
+
+    // Check duplicate mobile excluding this shop
+    const duplicateQuery = mongoose.Types.ObjectId.isValid(id)
+      ? { mobile_number: trimmedMobile, _id: { $ne: id } }
+      : { mobile_number: trimmedMobile, $nor: [{ _id: id }, { id: id }] };
+
+    const duplicate = await Shop.findOne(duplicateQuery);
+    if (duplicate) {
+      return res.status(400).json({ error: 'A shop with this mobile number already exists' });
+    }
+
+    const updateFields = {
+      shop_name: shop_name.trim(),
+      mobile_number: trimmedMobile,
+      location_id: location_id || null,
+      updated_at: new Date()
+    };
+    if (contact_person !== undefined) updateFields.contact_person = contact_person?.trim() || '';
+    if (full_address !== undefined) updateFields.full_address = full_address?.trim() || '';
+    if (notes !== undefined) updateFields.notes = notes?.trim() || '';
+
+    let updated = null;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      updated = await Shop.findByIdAndUpdate(id, { $set: updateFields }, { new: true });
+    } else {
+      updated = await Shop.findOneAndUpdate(
+        { $or: [{ _id: id }, { id }] },
+        { $set: updateFields },
+        { new: true }
+      );
+    }
+
+    if (!updated) {
+      return res.status(404).json({ error: 'Shop not found' });
+    }
+
+    const json = updated.toJSON();
+    if (json.location_id) {
+      const loc = mongoose.Types.ObjectId.isValid(json.location_id)
+        ? await Location.findById(json.location_id)
+        : await Location.findOne({ $or: [{ _id: json.location_id }, { id: json.location_id }] });
+      if (loc) json.location = loc.toJSON();
+    }
+
+    res.json(json);
+  } catch (err) {
+    console.error('Error updating shop:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // DELETE /api/shops/:id
 router.delete('/shops/:id', async (req, res) => {
   try {

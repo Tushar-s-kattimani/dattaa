@@ -232,6 +232,80 @@ export const dataService = {
     }
   },
 
+  updateShop: async (
+    id: string,
+    shopData: {
+      shop_name: string;
+      contact_person?: string;
+      mobile_number: string;
+      location_id: string;
+      full_address?: string;
+      notes?: string;
+    }
+  ): Promise<Shop> => {
+    try {
+      const res = await fetch(`/api/shops/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(shopData)
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to update shop');
+      }
+
+      const updatedShop: Shop = await res.json();
+      const raw = localStorage.getItem('shop_manager_shops');
+      if (raw) {
+        const shops: Shop[] = JSON.parse(raw);
+        localStorage.setItem(
+          'shop_manager_shops',
+          JSON.stringify(shops.map(s => (s.id === id ? updatedShop : s)))
+        );
+      }
+      return updatedShop;
+    } catch (err: any) {
+      console.warn('API error, updating in local fallback:', err);
+      const raw = localStorage.getItem('shop_manager_shops');
+      const shops: Shop[] = raw ? JSON.parse(raw) : [];
+
+      if (shops.some(s => s.id !== id && s.mobile_number === shopData.mobile_number.trim())) {
+        throw new Error('A shop with this mobile number already exists');
+      }
+
+      const rawLocs = localStorage.getItem('shop_manager_locations');
+      const locs: Location[] = rawLocs ? JSON.parse(rawLocs) : [...DEFAULT_INITIAL_LOCATIONS];
+      const loc = locs.find(l => l.id === shopData.location_id);
+
+      let updatedShop: Shop | null = null;
+      const updatedList = shops.map(s => {
+        if (s.id === id) {
+          updatedShop = {
+            ...s,
+            shop_name: shopData.shop_name.trim(),
+            mobile_number: shopData.mobile_number.trim(),
+            location_id: shopData.location_id,
+            contact_person: shopData.contact_person ?? s.contact_person,
+            full_address: shopData.full_address ?? s.full_address,
+            notes: shopData.notes ?? s.notes,
+            location: loc,
+            updated_at: new Date().toISOString()
+          };
+          return updatedShop;
+        }
+        return s;
+      });
+
+      if (!updatedShop) {
+        throw new Error('Shop not found');
+      }
+
+      localStorage.setItem('shop_manager_shops', JSON.stringify(updatedList));
+      return updatedShop;
+    }
+  },
+
   deleteShop: async (id: string): Promise<void> => {
     try {
       const res = await fetch(`/api/shops/${id}`, { method: 'DELETE' });
