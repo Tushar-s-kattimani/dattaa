@@ -1,12 +1,15 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import { connectDB, Location, Shop } from './db.js';
+import { connectDB, Location, Shop, isDBConnected } from './db.js';
 
 const router = express.Router();
 
 // Health check
-router.get('/health', (req, res) => {
-  const isConnected = mongoose.connection.readyState === 1;
+router.get('/health', async (req, res) => {
+  if (!isDBConnected()) {
+    await connectDB();
+  }
+  const isConnected = isDBConnected();
   res.json({
     status: isConnected ? 'ok' : 'disconnected',
     database: 'mongodb',
@@ -104,10 +107,10 @@ router.post('/translate', async (req, res) => {
 
 // Middleware to ensure DB connection
 router.use(async (req, res, next) => {
-  if (mongoose.connection.readyState !== 1) {
+  if (!isDBConnected()) {
     await connectDB();
   }
-  if (mongoose.connection.readyState !== 1) {
+  if (!isDBConnected()) {
     return res.status(503).json({
       error: 'MongoDB Atlas is not connected (IP not whitelisted or offline).'
     });

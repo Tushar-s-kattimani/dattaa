@@ -34,6 +34,10 @@ export async function connectDB() {
   }
 }
 
+export function isDBConnected() {
+  return mongoose.connection.readyState === 1;
+}
+
 // Location Schema
 const locationSchema = new mongoose.Schema({
   location_name: { type: String, required: true },

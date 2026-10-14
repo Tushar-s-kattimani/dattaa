@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { dataService } from '../lib/dataService';
 import type { Shop, Location } from '../types';
 import toast from 'react-hot-toast';
@@ -34,6 +35,7 @@ import { downloadShopRecordsWord, isRawUuidOrId } from '../lib/wordGenerator';
 import clsx from 'clsx';
 
 export const ShopRecords = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [shops, setShops] = useState<Shop[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,8 +58,15 @@ export const ShopRecords = () => {
 
   // Filtering and sorting
   const [searchTerm, setSearchTerm] = useState('');
-  const [locationFilter, setLocationFilter] = useState('');
+  const [locationFilter, setLocationFilter] = useState(() => searchParams.get('location') || '');
   const [sortField, setSortField] = useState<'location' | 'shop_name'>('location');
+
+  useEffect(() => {
+    const locFromUrl = searchParams.get('location');
+    if (locFromUrl !== null) {
+      setLocationFilter(locFromUrl);
+    }
+  }, [searchParams]);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -577,7 +586,15 @@ export const ShopRecords = () => {
           <div>
             <select
               value={locationFilter}
-              onChange={(e) => setLocationFilter(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setLocationFilter(val);
+                if (val) {
+                  setSearchParams({ location: val });
+                } else {
+                  setSearchParams({});
+                }
+              }}
               className="w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2.5 border bg-white text-sm"
             >
               <option value="">{ui.allLocations}</option>

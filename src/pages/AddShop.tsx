@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { dataService } from '../lib/dataService';
 import type { Location } from '../types';
 import toast from 'react-hot-toast';
 import { Store, Phone, MapPin } from 'lucide-react';
 
 export const AddShop = () => {
+  const [searchParams] = useSearchParams();
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
   
@@ -19,16 +21,21 @@ export const AddShop = () => {
       try {
         const data = await dataService.getLocations();
         setLocations(data);
-        const defaultLoc = data.find(l => l.is_default);
-        if (defaultLoc) {
-          setFormData(prev => ({ ...prev, location_id: defaultLoc.id }));
+        const queryLoc = searchParams.get('location');
+        if (queryLoc && data.some(l => l.id === queryLoc)) {
+          setFormData(prev => ({ ...prev, location_id: queryLoc }));
+        } else {
+          const defaultLoc = data.find(l => l.is_default);
+          if (defaultLoc) {
+            setFormData(prev => ({ ...prev, location_id: defaultLoc.id }));
+          }
         }
       } catch (err) {
         console.error('Failed to load locations', err);
       }
     };
     fetchLocations();
-  }, []);
+  }, [searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
