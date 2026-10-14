@@ -188,11 +188,15 @@ export const ShopRecords = () => {
     toast.success(`Language switched to ${langNames[langCode]}`);
   };
 
-  const confirmDeleteShop = async () => {
+  const confirmDeleteShop = async (password: string) => {
     if (!deletingShop) return;
+    if (password !== '151571') {
+      toast.error('Incorrect deletion password! Cannot delete contact.');
+      return;
+    }
     setIsDeleting(true);
     try {
-      await dataService.deleteShop(deletingShop.id);
+      await dataService.deleteShop(deletingShop.id, password);
       toast.success(ui.deletedSuccess);
       setDeletingShop(null);
       await fetchData();

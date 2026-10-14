@@ -144,9 +144,12 @@ export const dataService = {
     }
   },
 
-  deleteLocation: async (id: string): Promise<void> => {
+  deleteLocation: async (id: string, password = '151571'): Promise<void> => {
     try {
-      const res = await fetch(`/api/locations/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/locations/${id}`, {
+        method: 'DELETE',
+        headers: { 'x-delete-password': password }
+      });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || 'Failed to delete location');
@@ -306,9 +309,12 @@ export const dataService = {
     }
   },
 
-  deleteShop: async (id: string): Promise<void> => {
+  deleteShop: async (id: string, password = '151571'): Promise<void> => {
     try {
-      const res = await fetch(`/api/shops/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/shops/${id}`, {
+        method: 'DELETE',
+        headers: { 'x-delete-password': password }
+      });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || 'Failed to delete shop');

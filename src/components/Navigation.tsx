@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Store, List, Settings, LayoutDashboard, PlusCircle } from 'lucide-react';
+import { Store, List, Settings, LayoutDashboard, PlusCircle, Lock } from 'lucide-react';
 import { dataService } from '../lib/dataService';
+import { lockAppSession } from './AppLock';
 import clsx from 'clsx';
 
 export const Navigation = () => {
@@ -57,8 +58,8 @@ export const Navigation = () => {
               </div>
             </div>
 
-            {/* Status Indicator (optimized for both desktop & mobile) */}
-            <div className="flex items-center">
+            {/* Status Indicator & Lock Button */}
+            <div className="flex items-center space-x-2">
               {isCloud ? (
                 <span
                   className="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200"
@@ -78,6 +79,17 @@ export const Navigation = () => {
                   <span className="sm:hidden">Offline / Local</span>
                 </span>
               )}
+
+              {/* Lock App Session Button */}
+              <button
+                type="button"
+                onClick={() => lockAppSession()}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors border border-slate-200 cursor-pointer"
+                title="Lock Application (Requires PIN 0801 to unlock)"
+              >
+                <Lock className="w-3.5 h-3.5 text-slate-500" />
+                <span className="hidden sm:inline">Lock</span>
+              </button>
             </div>
           </div>
         </div>

@@ -237,6 +237,11 @@ router.put('/locations/:id', async (req, res) => {
 // DELETE /api/locations/:id
 router.delete('/locations/:id', async (req, res) => {
   try {
+    const pwd = req.headers['x-delete-password'] || req.body?.password;
+    if (pwd !== '151571') {
+      return res.status(403).json({ error: 'Unauthorized: Invalid deletion password' });
+    }
+
     const { id } = req.params;
     const mongoose = (await import('mongoose')).default;
     
@@ -381,6 +386,11 @@ router.put('/shops/:id', async (req, res) => {
 // DELETE /api/shops/:id
 router.delete('/shops/:id', async (req, res) => {
   try {
+    const pwd = req.headers['x-delete-password'] || req.body?.password;
+    if (pwd !== '151571') {
+      return res.status(403).json({ error: 'Unauthorized: Invalid deletion password' });
+    }
+
     const { id } = req.params;
     const mongoose = (await import('mongoose')).default;
     if (mongoose.Types.ObjectId.isValid(id)) {

@@ -5,6 +5,7 @@ import { Dashboard } from './pages/Dashboard';
 import { AddShop } from './pages/AddShop';
 import { ShopRecords } from './pages/ShopRecords';
 import { Settings } from './pages/Settings';
+import { AppLock } from './components/AppLock';
 
 /**
  * Ensures that whenever the app is opened freshly in mobile or desktop,
@@ -30,19 +31,21 @@ function InitialLaunchHandler() {
 
 function App() {
   return (
-    <Router>
-      <InitialLaunchHandler />
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="add-shop" element={<AddShop />} />
-          <Route path="records" element={<ShopRecords />} />
-          <Route path="settings" element={<Settings />} />
-          {/* Fallback catch-all: always navigate to Dashboard */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
-    </Router>
+    <AppLock>
+      <Router>
+        <InitialLaunchHandler />
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="add-shop" element={<AddShop />} />
+            <Route path="records" element={<ShopRecords />} />
+            <Route path="settings" element={<Settings />} />
+            {/* Fallback catch-all: always navigate to Dashboard */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </Router>
+    </AppLock>
   );
 }
 

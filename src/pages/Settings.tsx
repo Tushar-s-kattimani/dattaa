@@ -170,11 +170,15 @@ export const Settings = () => {
     }
   };
 
-  const confirmDelete = async () => {
+  const confirmDelete = async (password: string) => {
     if (!deletingLocation) return;
+    if (password !== '151571') {
+      toast.error('Incorrect deletion password! Cannot delete location.');
+      return;
+    }
     setIsDeleting(true);
     try {
-      await dataService.deleteLocation(deletingLocation.id);
+      await dataService.deleteLocation(deletingLocation.id, password);
       toast.success('Location deleted successfully');
       setDeletingLocation(null);
       await fetchLocations();
